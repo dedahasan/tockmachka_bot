@@ -50,8 +50,8 @@ async def front_command(message: types.Message):
 Максимум 5 предложений."""},
                 {"role": "user", "content": "Напиши свежую сводку по боям вокруг Малой Токмачки в своём безумном стиле."}
             ],
-            temperature=0.85,
-            max_tokens=900
+            temperature=0.65,
+            max_tokens=2000
         )
 
 # Получаем текст
@@ -62,7 +62,7 @@ async def front_command(message: types.Message):
                 text = message_obj.content or ""
 
         if not text.strip():
-            text = "В Малой Токмачке тишина... Попробуй позже 🔥"
+            text = "В Малой Токмачке тишина... Попробуй позже (активированы белые списки) 🔥"
 
         # Умная обрезка
         final_text = smart_truncate(text.strip())
