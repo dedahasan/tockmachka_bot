@@ -1,7 +1,7 @@
 import asyncio
 import random
 from telegram import Update
-from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
+from telegram.ext import Application, CommandHandler, ContextTypes
 from aiogram import Bot, Dispatcher, types
 from aiogram.filters import Command
 from openai import AsyncOpenAI
@@ -17,17 +17,15 @@ dp = Dispatcher()
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
 
+def register_handlers(application: Application):
+    application.add_handler(CommandHandler("процент", procent_handler))
+
 async def procent_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     percent = round(random.uniform(65.0, 99.0), 2)
     
     text = f"Текущий процент удержания Малой Токмачки - {percent}%"
     
     await update.message.reply_text(text)
-
-
-# Регистрация обработчиков
-def register_handlers(application: Application):
-    application.add_handler(CommandHandler("процент", procent_handler))
 
 def smart_truncate(text: str, max_length: int = 3800):
     if len(text) <= max_length:
