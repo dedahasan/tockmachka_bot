@@ -7,10 +7,9 @@ from openai import AsyncOpenAI
 TOKEN = "8796438464:AAHK2J5VHjI23r5W1QhDTdR1giKCcCNLPog"
 AI_API_KEY = "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"
 
-client = AsyncOpenAI(
-    base_url="https://openrouter.ai/api/v1",   # ← Должно быть именно так
-    api_key=AI_API_KEY
-)
+client = AsyncOpenAI(base_url="https://openrouter.ai/api/v1", api_key=AI_API_KEY)
+bot = Bot(token=TOKEN)
+dp = Dispatcher()
 
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
@@ -55,6 +54,11 @@ async def news_command(message: types.Message):
     await message.reply("⏳ Осталось немного потерпеть...")
     await generate_response(message, prompt_type="terpenie")
 
+@dp.message(Command("поздняков"))
+async def news_command(message: types.Message):
+    await message.reply("⏳ Думаем...")
+    await generate_response(message, prompt_type="pozdnyak")
+
 
 # ====================== ОБЩАЯ ФУНКЦИЯ ======================
 async def generate_response(message: types.Message, prompt_type: str):
@@ -63,10 +67,13 @@ async def generate_response(message: types.Message, prompt_type: str):
             system_prompt = "Ты военный аналитик. Пиши нейтральную, но интересную сводку по Малой Токмачке."
         
         elif prompt_type == "ahmat":
-            system_prompt = "Ты пропагандист ЧВК Ахмат. Сильно хвали спецназ Ахмат,Кадырова, пиши героически и пафосно."
+            system_prompt = "Ты пропагандист ЧВК Ахмат. Начинай каждый ответ со слов (Как сообщает мой дорогой Брат АПТИ АЛЛАУДИНОВ). Сильно хвали спецназ Ахмат,Кадырова, Адам Кадыров получил медаль, пиши героически и пафосно."
         
         elif prompt_type == "finka":
             system_prompt = "Ты жёлтый военкор. Обязательно вставляй рекламу финок НКВД в каждом ответе."
+
+        elif prompt_type == "pozdnyak":
+            system_prompt = "Ты желтый военкор Поздняков. Ты лютый Z патриот но нелюбишь власть за их мягкость. Пиши очень эмоционально, используй неформальную речь, используй много мата, упомянай степашек и чурок, еблю в жопу, куколдизм, призывай к ядерным ударам, пиши часть слов КАПСОМ."
         
         elif prompt_type == "terpenie":
             system_prompt = """Пропогандируй терпение. Говори что нужно немного потерпеть, хвали тех кто терпит, используй цитаты славящие терпение"""
@@ -75,10 +82,10 @@ async def generate_response(message: types.Message, prompt_type: str):
             model="openrouter/owl-alpha",
             messages=[
                 {"role": "system", "content": system_prompt},
-                {"role": "user", "content": "Напиши свежую сводку по боям вокруг Малой Токмачки."}
+                {"role": "user", "content": "Напиши свежую сводку по боям вокруг Малой Токмачки.Максимум 5-6 предложений."}
             ],
-            temperature=0.7,
-            max_tokens=2500
+            temperature=0.8,
+            max_tokens=3000
         )
 
         text = response.choices[0].message.content.strip()
@@ -93,7 +100,8 @@ async def generate_response(message: types.Message, prompt_type: str):
         await message.reply("❌ Ошибка генерации. Попробуй позже.")
 
 async def main():
-    print("✅ Бот запущен | Умная обрезка включена")
+    await bot.delete_webhook(drop_pending_updates=True)
+    print("✅ Бот запущен с несколькими командами")
     await dp.start_polling(bot)
 
 if __name__ == "__main__":
