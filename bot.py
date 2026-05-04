@@ -51,7 +51,7 @@ async def front_command(message: types.Message):
                 {"role": "user", "content": "Напиши свежую сводку по боям вокруг Малой Токмачки в своём безумном стиле."}
             ],
             temperature=0.85,
-            max_tokens=400
+            max_tokens=900
         )
 
 # Получаем текст
