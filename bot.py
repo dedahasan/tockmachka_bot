@@ -72,7 +72,7 @@ async def generate_response(message: types.Message, prompt_type: str):
             system_prompt = """Пропогандируй терпение. Говори что нужно немного потерпеть, хвали тех кто терпит, используй цитаты славящие терпение"""
 
         response = await client.chat.completions.create(
-            model="google/gemini-2.0-flash-exp:free",
+            model="openrouter/owl-alpha",
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": "Напиши свежую сводку по боям вокруг Малой Токмачки."}
