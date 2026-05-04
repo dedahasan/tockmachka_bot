@@ -17,6 +17,8 @@ dp = Dispatcher()
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
 
+application.add_handler(CommandHandler("процент", procent_handler))
+
 async def procent_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Генерируем случайное число от 65.00 до 99.00
     percent = round(random.uniform(65.0, 99.0), 2)
