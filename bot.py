@@ -28,23 +28,6 @@ def smart_truncate(text: str, max_length: int = 3800):
     # Если не нашли — обрезаем жёстко
     return text[:max_length - 50] + "... (продолжение в следующей серии 🔥)"
 
-@dp.message(Command("ahmat", "ахмат"))
-async def ahmat_command(message: types.Message):
-    await message.reply("⏳ Ахмат на связи...")
-
-     try:
-        response = await client.chat.completions.create(
-            model="openrouter/owl-alpha",   # ← Более стабильная модель
-            messages=[
-                {"role": "system", "content": 
-"""."""},
-                {"role": "user", "content": "Напиши свежую сводку по боям вокруг Малой Токмачки в своём безумном стиле."}
-            ],
-            temperature=0.85,
-            max_tokens=1000
-        )
-
-
 # ====================== КОМАНДА 1 ======================
 @dp.message(Command("front", "токмачка"))
 async def front_command(message: types.Message):
