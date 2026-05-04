@@ -17,24 +17,17 @@ dp = Dispatcher()
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
 
-application.add_handler(CommandHandler("процент", procent_handler))
-
 async def procent_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    # Генерируем случайное число от 65.00 до 99.00
     percent = round(random.uniform(65.0, 99.0), 2)
     
     text = f"Текущий процент удержания Малой Токмачки - {percent}%"
     
     await update.message.reply_text(text)
 
+
+# Регистрация обработчиков
 def register_handlers(application: Application):
-    # Реагируем на сообщение "процент" (регистронезависимо)
-    application.add_handler(
-        MessageHandler(
-            filters.TEXT,  # можно убрать ~filters.COMMAND, если хочешь реагировать и на /процент
-            procent_handler
-        )
-    )
+    application.add_handler(CommandHandler("процент", procent_handler))
 
 def smart_truncate(text: str, max_length: int = 3800):
     if len(text) <= max_length:
