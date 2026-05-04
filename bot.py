@@ -28,46 +28,82 @@ def smart_truncate(text: str, max_length: int = 3800):
     # Если не нашли — обрезаем жёстко
     return text[:max_length - 50] + "... (продолжение в следующей серии 🔥)"
 
-@dp.message(Command("news", "front", "токмачка"))
-async def front_command(message: types.Message):
-    await message.reply("⏳ Анализирую ситуацию вокруг Малой Токмачки...")
-    
-    try:
+@dp.message(Command("ahmat", "ахмат"))
+async def ahmat_command(message: types.Message):
+    await message.reply("⏳ Ахмат на связи...")
+
+     try:
         response = await client.chat.completions.create(
             model="openrouter/owl-alpha",   # ← Более стабильная модель
             messages=[
                 {"role": "system", "content": 
-"""Ты — главный редактор самой жёлтой газеты "Токмачка Экспресс".
-Стиль: гротескный, сенсационный, саркастичный, как у желтой прессы.
-Используй чёрный юмор и преувеличения.
-Пиши ОЧЕНЬ КОРОТКО!
-Максимум 4 предложения.
-Максимум 3200 символов.
-В каждом ответе обязательно упомяни спецназ "Ахмат" и рекламу финок НКВД.
-Пиши ТОЛЬКО чистую сводку на русском языке.
-Без заголовков, без "Сводка", без дат, без вступлений.
-Сразу начинай с текста.
-Максимум 5 предложений."""},
+"""."""},
                 {"role": "user", "content": "Напиши свежую сводку по боям вокруг Малой Токмачки в своём безумном стиле."}
             ],
-            temperature=0.65,
-            max_tokens=2000
+            temperature=0.85,
+            max_tokens=1000
         )
 
-# Получаем текст
-        text = ""
-        if hasattr(response, 'choices') and response.choices:
-            message_obj = response.choices[0].message
-            if message_obj and hasattr(message_obj, 'content'):
-                text = message_obj.content or ""
 
-        if not text.strip():
-            text = "В Малой Токмачке тишина... Попробуй позже (активированы белые списки) 🔥"
+# ====================== КОМАНДА 1 ======================
+@dp.message(Command("front", "токмачка"))
+async def front_command(message: types.Message):
+    await message.reply("⏳ Генерирую сводку...")
+    await generate_response(message, prompt_type="normal")
 
-        # Умная обрезка
-        final_text = smart_truncate(text.strip())
 
-        await message.reply(final_text)
+# ====================== КОМАНДА 2 ======================
+@dp.message(Command("ahmat","ахмат"))
+async def ahmat_command(message: types.Message):
+    await message.reply("⏳ Ахмат на связи...")
+    await generate_response(message, prompt_type="ahmat")
+
+
+# ====================== КОМАНДА 3 ======================
+@dp.message(Command("finka", "финка"))
+async def finka_command(message: types.Message):
+    await message.reply("⏳ Финка НКВД в деле...")
+    await generate_response(message, prompt_type="finka")
+
+
+# ====================== КОМАНДА 4 ======================
+@dp.message(Command("терпение"))
+async def news_command(message: types.Message):
+    await message.reply("⏳ Осталось немного потерпеть...")
+    await generate_response(message, prompt_type="terpenie")
+
+
+# ====================== ОБЩАЯ ФУНКЦИЯ ======================
+async def generate_response(message: types.Message, prompt_type: str):
+    try:
+        if prompt_type == "normal":
+            system_prompt = "Ты военный аналитик. Пиши нейтральную, но интересную сводку по Малой Токмачке."
+        
+        elif prompt_type == "ahmat":
+            system_prompt = "Ты пропагандист ЧВК Ахмат. Сильно хвали спецназ Ахмат,Кадырова, пиши героически и пафосно."
+        
+        elif prompt_type == "finka":
+            system_prompt = "Ты жёлтый военкор. Обязательно вставляй рекламу финок НКВД в каждом ответе."
+        
+        elif prompt_type == "terpenie":
+            system_prompt = """Пропогандируй терпение. Говори что нужно немного потерпеть, хвали тех кто терпит, используй цитаты славящие терпение"""
+
+        response = await client.chat.completions.create(
+            model="google/gemini-2.0-flash-exp:free",
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": "Напиши свежую сводку по боям вокруг Малой Токмачки."}
+            ],
+            temperature=0.7,
+            max_tokens=2500
+        )
+
+        text = response.choices[0].message.content.strip()
+        
+        if len(text) > 3800:
+            text = text[:3750] + "... (продолжение 🔥)"
+            
+        await message.reply(text)
 
     except Exception as e:
         print("ПОЛНАЯ ОШИБКА:", str(e))
